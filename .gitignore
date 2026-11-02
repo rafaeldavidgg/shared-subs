@@ -1,0 +1,21 @@
+# ODD working docs (local planning log, mirrored in memory) - not part of the public app
+odd/
+
+# Local private data - never commit real contacts
+data/*.json
+exports/
+*.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Node (only for optional verification tooling)
+node_modules/
+playwright-report/
+test-results/
+verify-*.png

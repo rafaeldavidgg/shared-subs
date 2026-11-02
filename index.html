@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Gestor local de suscripciones compartidas. Tus datos permanecen en tu navegador." data-i18n-meta="description" />
+  <meta name="theme-color" content="#1a2e28" />
+  <title>Shared Subs - Gestor local</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="6" fill="#1a2e28"/>
+          <path d="M7 12.5l3.2 3.2L17 9" stroke="#f2efe6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <p class="brand-title">Shared Subs</p>
+          <p class="brand-sub" data-i18n="brandSub">Local · Estático · Sin cuenta</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <label class="month-field">
+          <span data-i18n="month">Mes</span>
+          <input id="monthPicker" type="month" aria-label="Mes de facturación" data-i18n-aria="monthAria" />
+        </label>
+        <button id="exportBtn" class="btn btn-ghost" type="button" data-i18n="export">Exportar</button>
+        <label class="btn btn-ghost file-label">
+          <span data-i18n="import">Importar</span>
+          <input id="importFile" type="file" accept="application/json" hidden />
+        </label>
+        <button id="langBtn" class="btn btn-ghost lang-btn" type="button" aria-label="Switch to English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="intro" aria-labelledby="intro-title">
+      <h1 id="intro-title" data-i18n="headline">Cobra tu parte sin perseguir a nadie.</h1>
+      <p class="lede" data-i18n="lede">Define cada suscripción una vez con sus contactos exactos y su mensaje exacto. Cada mes abre WhatsApp con el texto listo y marca los pagos. Tus datos nunca salen de este navegador.</p>
+      <div class="intro-stats" role="status" aria-live="polite">
+        <div><strong id="statSubs">0</strong><span data-i18n="stSubs">suscripciones</span></div>
+        <div><strong id="statDue">0</strong><span data-i18n="stDue">pendientes</span></div>
+        <div><strong id="statPaid">0</strong><span data-i18n="stPaid">pagados</span></div>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Barra de suscripciones" data-i18n-aria="toolbarAria">
+      <h2 data-i18n="subs">Suscripciones</h2>
+      <button id="addSubBtn" class="btn btn-primary" type="button">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span data-i18n="newSub">Nueva suscripción</span>
+      </button>
+    </section>
+
+    <div id="subList" class="sub-list"></div>
+
+    <section class="help" aria-labelledby="help-title">
+      <h2 id="help-title" data-i18n="howTitle">Cómo funciona el cobro mensual</h2>
+      <ol>
+        <li data-i18n="how1">Elige el mes de facturación arriba.</li>
+        <li data-i18n="how2">Revisa cada suscripción y el importe por persona.</li>
+        <li data-i18n="how3">Pulsa WhatsApp en la fila del contacto. El chat se abre con el mensaje listo, solo tienes que enviarlo.</li>
+        <li data-i18n="how4">Marca Pagado cuando recibas la parte correspondiente.</li>
+      </ol>
+      <p class="privacy-note" data-i18n="privacy">Privacidad: los contactos y las plantillas solo se guardan en localStorage bajo sharedSubs.v1. El repositorio público incluye datos de ejemplo ficticios.</p>
+    </section>
+  </main>
+
+  <dialog id="subDialog" aria-labelledby="subDialogTitle">
+    <form id="subForm" method="dialog">
+      <h2 id="subDialogTitle" data-i18n="subDlg">Suscripción</h2>
+      <label><span data-i18n="fName">Nombre</span><input id="fName" name="name" required maxlength="60" placeholder="Spotify Familiar" /></label>
+      <div class="grid-2">
+        <label><span data-i18n="fTotal">Total mensual</span><input id="fTotal" name="total" type="number" min="0" step="0.01" required placeholder="12.99" /></label>
+        <label><span data-i18n="fCur">Moneda</span><input id="fCurrency" name="currency" maxlength="6" placeholder="EUR" value="EUR" /></label>
+      </div>
+      <label><span data-i18n="fDay">Día de cobro</span><input id="fDay" name="day" type="number" min="1" max="28" value="1" /></label>
+      <label><span data-i18n="fTpl">Plantilla del mensaje</span>
+        <textarea id="fTemplate" name="template" rows="4" required placeholder="Hola {name}, tu parte de {service} de {month} es {amount}. Gracias."></textarea>
+      </label>
+      <p class="hint"><span data-i18n="vars">Variables:</span> <code>{name}</code> <code>{amount}</code> <code>{service}</code> <code>{month}</code></p>
+      <menu>
+        <button value="cancel" class="btn btn-ghost" type="submit" data-i18n="cancel">Cancelar</button>
+        <button id="saveSubBtn" value="default" class="btn btn-primary" type="submit" data-i18n="save">Guardar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="contactDialog" aria-labelledby="contactDialogTitle">
+    <form id="contactForm" method="dialog">
+      <h2 id="contactDialogTitle" data-i18n="ctDlg">Contacto</h2>
+      <label><span data-i18n="cName">Nombre</span><input id="cName" required maxlength="60" placeholder="Alex" /></label>
+      <label><span data-i18n="cPhone">Teléfono con código de país</span><input id="cPhone" required inputmode="tel" placeholder="34600000001" pattern="[+0-9][0-9 ()-]{5,20}" /></label>
+      <p class="hint" data-i18n="cHint">Usa solo dígitos con código de país. Ejemplo: 34600000001. Los enlaces usan wa.me.</p>
+      <menu>
+        <button value="cancel" class="btn btn-ghost" type="submit" data-i18n="cancel">Cancelar</button>
+        <button value="default" class="btn btn-primary" type="submit" data-i18n="save">Guardar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p data-i18n="footer">Versión estática para GitHub Pages. Sin seguimiento, sin servidor, sin coste.</p>
+      <p><a href="./README.md" data-i18n="guide">Guía de instalación y despliegue</a></p>
+    </div>
+  </footer>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
